@@ -7,18 +7,20 @@ import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.io.Serializable;
 
 @Entity(name = "application")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Application implements Serializable {
+public class Application {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
-    private String id;
+    private Long id;
 
     @Column(name = "application_id", nullable = false)
     private String applicationId;

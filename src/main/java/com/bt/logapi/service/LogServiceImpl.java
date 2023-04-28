@@ -3,7 +3,9 @@ package com.bt.logapi.service;
 import com.bt.logapi.model.ApiResponse;
 import com.bt.logapi.model.dto.RegisterApplicationDTO;
 import com.bt.logapi.model.entity.ApplicationLogs;
+import com.bt.logapi.repository.ApplicationRepository;
 import com.bt.logapi.repository.LogRepository;
+import com.bt.logapi.utils.DtoToEntityMapper;
 import com.bt.logapi.utils.RequestValidator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,13 +17,17 @@ import java.util.List;
 @Service
 public class LogServiceImpl implements LogService {
 
-    private final LogRepository repository;
+    private final LogRepository logRepository;
+
+    private final ApplicationRepository applicationRepository;
 
     private final ObjectFactory<ApiResponse> apiResponseObjectFactory;
 
     public LogServiceImpl(LogRepository repository,
+                          ApplicationRepository applicationRepository,
                           ObjectFactory<ApiResponse> apiResponseObjectFactory) {
-        this.repository = repository;
+        this.logRepository = repository;
+        this.applicationRepository = applicationRepository;
         this.apiResponseObjectFactory = apiResponseObjectFactory;
 
     }
@@ -30,7 +36,7 @@ public class LogServiceImpl implements LogService {
     public ApiResponse retrieveLogs(String id) throws JsonProcessingException {
         RequestValidator.isValidId(id);
         ApiResponse apiResponse = apiResponseObjectFactory.getObject();
-        List<ApplicationLogs> databaseResponse = repository.findAllLogsByApplicationId(id);
+        List<ApplicationLogs> databaseResponse = logRepository.findAllLogsByApplicationId(id);
         if(databaseResponse.isEmpty()) {
             handleResponse(apiResponse, String.format("No logs found for application : %s", id), 400, false);
         } else {
@@ -41,7 +47,11 @@ public class LogServiceImpl implements LogService {
 
     @Override
     public ApiResponse registerApplication(RegisterApplicationDTO registerApplicationDTO) {
-        return null;
+        RequestValidator.isValidId(registerApplicationDTO.getApplicationId());
+        ApiResponse apiResponse = apiResponseObjectFactory.getObject();
+        applicationRepository.save(DtoToEntityMapper.map(registerApplicationDTO));
+        handleResponse(apiResponse, "OK", 201, true);
+        return apiResponse;
     }
 
     private String writeValueAsString(List<ApplicationLogs> databaseResponse) throws JsonProcessingException {

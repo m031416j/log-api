@@ -1,7 +1,9 @@
 package com.bt.logapi.service;
 
 import com.bt.logapi.model.ApiResponse;
+import com.bt.logapi.model.dto.RegisterApplicationDTO;
 import com.bt.logapi.model.entity.ApplicationLogs;
+import com.bt.logapi.repository.ApplicationRepository;
 import com.bt.logapi.repository.LogRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,11 +15,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.ObjectFactory;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.sql.Date;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -37,7 +37,10 @@ class LogServiceImplTest {
     private ObjectFactory<ApiResponse> apiResponseObjectFactory;
 
     @Mock
-    private LogRepository repository;
+    private LogRepository logRepository;
+
+    @Mock
+    private ApplicationRepository applicationRepository;
 
 
     @BeforeEach
@@ -54,7 +57,7 @@ class LogServiceImplTest {
 
         // when
         when(apiResponseObjectFactory.getObject()).thenReturn(new ApiResponse());
-        when(repository.findAllLogsByApplicationId(id)).thenReturn(logs);
+        when(logRepository.findAllLogsByApplicationId(id)).thenReturn(logs);
 
         ApiResponse response = service.retrieveLogs(id);
 
@@ -73,7 +76,7 @@ class LogServiceImplTest {
 
         // when
         when(apiResponseObjectFactory.getObject()).thenReturn(new ApiResponse());
-        when(repository.findAllLogsByApplicationId(id)).thenReturn(logs);
+        when(logRepository.findAllLogsByApplicationId(id)).thenReturn(logs);
 
         ApiResponse response = service.retrieveLogs(id);
 
@@ -83,6 +86,24 @@ class LogServiceImplTest {
         assertEquals(400, response.getResponseCode());
         assertFalse(response.isSuccess());
     }
+
+    @Test
+    @DisplayName("When given valid app then register a new app")
+    void testRegisterNewApplicationSuccess() {
+        // given
+        RegisterApplicationDTO dto = new RegisterApplicationDTO();
+        dto.setApplicationId("app1");
+        // when
+        when(apiResponseObjectFactory.getObject()).thenReturn(new ApiResponse());
+        when(applicationRepository.save(any())).thenReturn(null);
+        ApiResponse response = service.registerApplication(dto);
+
+        // then
+        assertNotNull(response);
+        assertEquals(201, response.getResponseCode());
+        assertTrue(response.isSuccess());
+    }
+
 
     private List<ApplicationLogs> generateLogs() {
         List<ApplicationLogs> logs = new ArrayList<>();
