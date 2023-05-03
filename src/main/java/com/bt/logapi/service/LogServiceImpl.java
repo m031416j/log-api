@@ -1,32 +1,40 @@
 package com.bt.logapi.service;
 
 import com.bt.logapi.model.ApiResponse;
+import com.bt.logapi.model.dto.ApplicationLogDTO;
 import com.bt.logapi.model.dto.RegisterApplicationDTO;
-import com.bt.logapi.model.entity.ApplicationLogs;
+import com.bt.logapi.model.entity.ApplicationLog;
 import com.bt.logapi.repository.ApplicationRepository;
-import com.bt.logapi.repository.LogRepository;
+import com.bt.logapi.repository.ApplicationLogRepository;
 import com.bt.logapi.utils.DtoToEntityMapper;
 import com.bt.logapi.utils.RequestValidator;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.stereotype.Service;
 
+import java.text.DateFormat;
 import java.util.List;
 
 @Service
+@Slf4j
 public class LogServiceImpl implements LogService {
 
-    private final LogRepository logRepository;
+    private final ApplicationLogRepository applicationLogRepository;
 
     private final ApplicationRepository applicationRepository;
 
     private final ObjectFactory<ApiResponse> apiResponseObjectFactory;
 
-    public LogServiceImpl(LogRepository repository,
+    private final ObjectMapper mapper = generateMapper();
+
+    public LogServiceImpl(ApplicationLogRepository repository,
                           ApplicationRepository applicationRepository,
                           ObjectFactory<ApiResponse> apiResponseObjectFactory) {
-        this.logRepository = repository;
+        this.applicationLogRepository = repository;
         this.applicationRepository = applicationRepository;
         this.apiResponseObjectFactory = apiResponseObjectFactory;
 
@@ -36,7 +44,7 @@ public class LogServiceImpl implements LogService {
     public ApiResponse retrieveLogs(String id) throws JsonProcessingException {
         RequestValidator.isValidId(id);
         ApiResponse apiResponse = apiResponseObjectFactory.getObject();
-        List<ApplicationLogs> databaseResponse = logRepository.findAllLogsByApplicationId(id);
+        List<ApplicationLog> databaseResponse = applicationLogRepository.findAllLogsByApplicationId(id);
         if(databaseResponse.isEmpty()) {
             handleResponse(apiResponse, String.format("No logs found for application : %s", id), 400, false);
         } else {
@@ -54,7 +62,18 @@ public class LogServiceImpl implements LogService {
         return apiResponse;
     }
 
-    private String writeValueAsString(List<ApplicationLogs> databaseResponse) throws JsonProcessingException {
+    @Override
+    public void saveLog(String message) throws JsonProcessingException {
+        try {
+            ApplicationLogDTO applicationLogDTO = mapper.readValue(message, ApplicationLogDTO.class);
+            log.info(applicationLogDTO.getDescription());
+        } catch (Exception ex) {
+            log.error("Error mapping message : {}", ex.getMessage());
+        }
+        // applicationLogRepository.save(log);
+    }
+
+    private String writeValueAsString(List<ApplicationLog> databaseResponse) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsString(databaseResponse);
     }
@@ -63,5 +82,13 @@ public class LogServiceImpl implements LogService {
         apiResponse.setData(data);
         apiResponse.setResponseCode(code);
         apiResponse.setSuccess(isSuccess);
+    }
+
+    protected ObjectMapper generateMapper() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.setDateFormat(DateFormat.getDateInstance());
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        objectMapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
+        return objectMapper;
     }
 }

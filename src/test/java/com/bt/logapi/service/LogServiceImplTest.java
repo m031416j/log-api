@@ -2,9 +2,9 @@ package com.bt.logapi.service;
 
 import com.bt.logapi.model.ApiResponse;
 import com.bt.logapi.model.dto.RegisterApplicationDTO;
-import com.bt.logapi.model.entity.ApplicationLogs;
+import com.bt.logapi.model.entity.ApplicationLog;
 import com.bt.logapi.repository.ApplicationRepository;
-import com.bt.logapi.repository.LogRepository;
+import com.bt.logapi.repository.ApplicationLogRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -37,7 +37,7 @@ class LogServiceImplTest {
     private ObjectFactory<ApiResponse> apiResponseObjectFactory;
 
     @Mock
-    private LogRepository logRepository;
+    private ApplicationLogRepository applicationLogRepository;
 
     @Mock
     private ApplicationRepository applicationRepository;
@@ -53,11 +53,11 @@ class LogServiceImplTest {
     void testRetrieveLogsSuccess() throws JsonProcessingException {
         // given
         String id = "app1";
-        List<ApplicationLogs> logs = generateLogs();
+        List<ApplicationLog> logs = generateLogs();
 
         // when
         when(apiResponseObjectFactory.getObject()).thenReturn(new ApiResponse());
-        when(logRepository.findAllLogsByApplicationId(id)).thenReturn(logs);
+        when(applicationLogRepository.findAllLogsByApplicationId(id)).thenReturn(logs);
 
         ApiResponse response = service.retrieveLogs(id);
 
@@ -72,11 +72,11 @@ class LogServiceImplTest {
     void testRetrieveLogsBadRequest() throws JsonProcessingException {
         // given
         String id = "app1";
-        List<ApplicationLogs> logs = new ArrayList<>();
+        List<ApplicationLog> logs = new ArrayList<>();
 
         // when
         when(apiResponseObjectFactory.getObject()).thenReturn(new ApiResponse());
-        when(logRepository.findAllLogsByApplicationId(id)).thenReturn(logs);
+        when(applicationLogRepository.findAllLogsByApplicationId(id)).thenReturn(logs);
 
         ApiResponse response = service.retrieveLogs(id);
 
@@ -105,9 +105,9 @@ class LogServiceImplTest {
     }
 
 
-    private List<ApplicationLogs> generateLogs() {
-        List<ApplicationLogs> logs = new ArrayList<>();
-        logs.add(new ApplicationLogs("test", new Date(1), "test", "test"));
+    private List<ApplicationLog> generateLogs() {
+        List<ApplicationLog> logs = new ArrayList<>();
+        logs.add(new ApplicationLog("test", new Date(1), "test", "test"));
         return logs;
     }
 

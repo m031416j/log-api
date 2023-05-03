@@ -18,7 +18,7 @@ import java.sql.Date;
 @NoArgsConstructor
 @Getter
 @Setter
-public class ApplicationLogs {
+public class ApplicationLog {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "log_id", nullable = false)
