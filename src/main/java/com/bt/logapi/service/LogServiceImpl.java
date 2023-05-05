@@ -12,6 +12,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.stereotype.Service;
@@ -63,18 +64,20 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
-    public void saveLog(String message) throws JsonProcessingException {
+    public void saveLog(String message) {
         try {
             ApplicationLogDTO applicationLogDTO = mapper.readValue(message, ApplicationLogDTO.class);
-            log.info(applicationLogDTO.getDescription());
+            applicationLogRepository.save(DtoToEntityMapper.map(applicationLogDTO));
+            log.error("Successfully Stored Log In The Database");
         } catch (Exception ex) {
             log.error("Error mapping message : {}", ex.getMessage());
         }
-        // applicationLogRepository.save(log);
     }
 
     private String writeValueAsString(List<ApplicationLog> databaseResponse) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.setDateFormat(DateFormat.getDateInstance());
         return objectMapper.writeValueAsString(databaseResponse);
     }
 
@@ -86,6 +89,7 @@ public class LogServiceImpl implements LogService {
 
     protected ObjectMapper generateMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
         objectMapper.setDateFormat(DateFormat.getDateInstance());
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);

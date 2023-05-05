@@ -11,7 +11,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.sql.Date;
+import java.time.LocalDateTime;
 
 @Entity(name = "log")
 @AllArgsConstructor
@@ -23,16 +23,15 @@ public class ApplicationLog {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "log_id", nullable = false)
     @JsonProperty("id")
-    private String id;
+    private Integer id;
 
     @JsonProperty("timestamp")
-    private Date timestamp;
+    private LocalDateTime timestamp;
 
     @JsonProperty("description")
     private String description;
 
     @JsonProperty("applicationId")
-//    @ManyToOne(fetch = FetchType.LAZY)
     @Column(name = "application_id")
     private String applicationId;
 

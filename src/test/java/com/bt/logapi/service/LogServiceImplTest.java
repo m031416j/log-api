@@ -3,8 +3,8 @@ package com.bt.logapi.service;
 import com.bt.logapi.model.ApiResponse;
 import com.bt.logapi.model.dto.RegisterApplicationDTO;
 import com.bt.logapi.model.entity.ApplicationLog;
-import com.bt.logapi.repository.ApplicationRepository;
 import com.bt.logapi.repository.ApplicationLogRepository;
+import com.bt.logapi.repository.ApplicationRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,16 +15,24 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.ObjectFactory;
+import org.springframework.util.ResourceUtils;
 
-import java.sql.Date;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -104,10 +112,42 @@ class LogServiceImplTest {
         assertTrue(response.isSuccess());
     }
 
+    @Test
+    @DisplayName("When given valid message then log a new message in the database")
+    void testLogMessageSuccess() throws IOException {
+        // given
+
+        final String filePath = "classpath:data/sqsLog.json";
+        final String message = Files.readString(Paths.get(ResourceUtils.getFile(filePath).toURI()));
+
+        // when
+        when(applicationLogRepository.save(any())).thenReturn(null);
+        service.saveLog(message);
+
+        // then
+        verify(applicationLogRepository, times(1)).save(any());
+        assertTrue(true);
+    }
+
+    @Test
+    @DisplayName("When given an invalid message then throw json parsing exception")
+    void testLogMessageParsingException() throws IOException {
+        // given
+
+        // when
+
+        service.saveLog(null);
+
+        // then
+        verify(applicationLogRepository, times(0)).save(any());
+        assertTrue(true);
+
+    }
+
 
     private List<ApplicationLog> generateLogs() {
         List<ApplicationLog> logs = new ArrayList<>();
-        logs.add(new ApplicationLog("test", new Date(1), "test", "test"));
+        logs.add(new ApplicationLog(1, LocalDateTime.now(), "test", "test"));
         return logs;
     }
 

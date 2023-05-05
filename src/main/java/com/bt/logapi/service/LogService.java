@@ -10,5 +10,5 @@ public interface LogService {
 
     ApiResponse registerApplication(RegisterApplicationDTO registerApplicationDTO);
 
-    void saveLog(String message) throws JsonProcessingException;
+    void saveLog(String message);
 }
