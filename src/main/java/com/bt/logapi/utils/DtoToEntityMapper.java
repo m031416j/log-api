@@ -5,6 +5,9 @@ import com.bt.logapi.model.dto.RegisterApplicationDTO;
 import com.bt.logapi.model.entity.Application;
 import com.bt.logapi.model.entity.ApplicationLog;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 public class DtoToEntityMapper {
 
     private DtoToEntityMapper(){}
@@ -19,7 +22,16 @@ public class DtoToEntityMapper {
         ApplicationLog applicationLog = new ApplicationLog();
         applicationLog.setApplicationId(applicationLogDTO.getApplicationId());
         applicationLog.setDescription(applicationLogDTO.getDescription());
-        applicationLog.setTimestamp(applicationLogDTO.getTimestamp());
+
+        // Convert the timestamp to MySQL compatible format
+        LocalDateTime timestamp = applicationLogDTO.getTimestamp();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String mysqlFormat = timestamp.format(formatter);
+
+
+        applicationLog.setTimestamp(LocalDateTime.parse(mysqlFormat, formatter));
+
         return applicationLog;
     }
+
 }

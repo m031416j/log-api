@@ -67,7 +67,8 @@ public class LogServiceImpl implements LogService {
     public void saveLog(String message) {
         try {
             ApplicationLogDTO applicationLogDTO = mapper.readValue(message, ApplicationLogDTO.class);
-            applicationLogRepository.save(DtoToEntityMapper.map(applicationLogDTO));
+            ApplicationLog applicationLog = DtoToEntityMapper.map(applicationLogDTO);
+            applicationLogRepository.save(applicationLog);
             log.error("Successfully Stored Log In The Database");
         } catch (Exception ex) {
             log.error("Error mapping message : {}", ex.getMessage());
