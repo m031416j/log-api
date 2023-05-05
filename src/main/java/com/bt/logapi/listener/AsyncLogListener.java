@@ -1,12 +1,9 @@
 package com.bt.logapi.listener;
 
-import com.amazonaws.services.sqs.model.Message;
-import com.bt.logapi.config.AmazonSQSComponent;
 import com.bt.logapi.service.LogService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.aws.messaging.config.annotation.EnableSqs;
-import org.springframework.cloud.aws.messaging.listener.Acknowledgment;
 import org.springframework.cloud.aws.messaging.listener.SqsMessageDeletionPolicy;
 import org.springframework.cloud.aws.messaging.listener.annotation.SqsListener;
 import org.springframework.stereotype.Component;
