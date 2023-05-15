@@ -43,8 +43,8 @@ class LogControllerTest {
         String id = "123";
         // when
         when(service.retrieveLogs(id)).thenReturn(apiResponse);
-        when(apiResponse.isSuccess()).thenReturn(true);
         when(apiResponse.getData()).thenReturn("OK");
+        when(apiResponse.getResponseCode()).thenReturn(200);
         final RequestBuilder requestBuilder = MockMvcRequestBuilders.get
                 ("/api/retrieve-logs/{id}", id);
         final MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
@@ -61,7 +61,6 @@ class LogControllerTest {
         String id = "123";
         // when
         when(service.retrieveLogs(id)).thenReturn(apiResponse);
-        when(apiResponse.isSuccess()).thenReturn(false);
         when(apiResponse.getData()).thenReturn("BAD REQUEST");
         when(apiResponse.getResponseCode()).thenReturn(400);
         final RequestBuilder requestBuilder = MockMvcRequestBuilders.get
@@ -80,7 +79,7 @@ class LogControllerTest {
         final String filePath = "classpath:data/registerApplicationDto_201.json";
         // when
         when(service.registerApplication(any())).thenReturn(apiResponse);
-        when(apiResponse.isSuccess()).thenReturn(true);
+        when(apiResponse.getResponseCode()).thenReturn(201);
         final RequestBuilder requestBuilder = MockMvcRequestBuilders.post
                 ("/api/register-app")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -94,12 +93,11 @@ class LogControllerTest {
 
     @Test
     @DisplayName("When register app is called with an invalid dto then return 400")
-    void testRegisterApplicationBadRequest() throws Exception {
+    public void testRegisterApplicationBadRequest() throws Exception {
         // given
         final String filePath = "classpath:data/registerApplicationDto_201.json";
         // when
         when(service.registerApplication(any())).thenReturn(apiResponse);
-        when(apiResponse.isSuccess()).thenReturn(false);
         when(apiResponse.getData()).thenReturn("BAD REQUEST");
         when(apiResponse.getResponseCode()).thenReturn(400);
         final RequestBuilder requestBuilder = MockMvcRequestBuilders.post

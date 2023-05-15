@@ -17,7 +17,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.util.ResourceUtils;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -26,9 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
@@ -72,7 +69,6 @@ class LogServiceImplTest {
         // then
         assertNotNull(response);
         assertEquals(200, response.getResponseCode());
-        assertTrue(response.isSuccess());
     }
 
     @Test
@@ -92,7 +88,7 @@ class LogServiceImplTest {
         assertNotNull(response);
         assertEquals(String.format("No logs found for application : %s", id), response.getData());
         assertEquals(400, response.getResponseCode());
-        assertFalse(response.isSuccess());
+
     }
 
     @Test
@@ -109,7 +105,7 @@ class LogServiceImplTest {
         // then
         assertNotNull(response);
         assertEquals(201, response.getResponseCode());
-        assertTrue(response.isSuccess());
+
     }
 
     @Test

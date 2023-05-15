@@ -25,9 +25,6 @@ public class LogController {
     @GetMapping(value = "/api/retrieve-logs/{id}", produces = { "application/json;charset=utf-8" })
     public ResponseEntity<Object> retrieveLogs(@PathVariable String id) throws JsonProcessingException {
         ApiResponse response = logService.retrieveLogs(id);
-        if(response.isSuccess()) {
-            return new ResponseEntity<>(response.getData(), HttpStatus.OK);
-        }
         return new ResponseEntity<>(response.getData(), HttpStatus.valueOf(response.getResponseCode()));
     }
 
@@ -35,9 +32,6 @@ public class LogController {
     @PostMapping("/api/register-app")
     public ResponseEntity<Object> registerApplication(@RequestBody RegisterApplicationDTO registerApplicationDTO) {
         ApiResponse response = logService.registerApplication(registerApplicationDTO);
-        if(response.isSuccess()) {
-            return new ResponseEntity<>(HttpStatus.CREATED);
-        }
         return new ResponseEntity<>(response.getData(), HttpStatus.valueOf(response.getResponseCode()));
     }
 }

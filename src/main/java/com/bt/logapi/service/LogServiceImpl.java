@@ -47,9 +47,9 @@ public class LogServiceImpl implements LogService {
         ApiResponse apiResponse = apiResponseObjectFactory.getObject();
         List<ApplicationLog> databaseResponse = applicationLogRepository.findAllLogsByApplicationId(id);
         if(databaseResponse.isEmpty()) {
-            handleResponse(apiResponse, String.format("No logs found for application : %s", id), 400, false);
+            handleResponse(apiResponse, String.format("No logs found for application : %s", id), 404);
         } else {
-            handleResponse(apiResponse, writeValueAsString(databaseResponse), 200, true);
+            handleResponse(apiResponse, writeValueAsString(databaseResponse), 200);
         }
         return apiResponse;
     }
@@ -59,7 +59,7 @@ public class LogServiceImpl implements LogService {
         RequestValidator.isValidId(registerApplicationDTO.getApplicationId());
         ApiResponse apiResponse = apiResponseObjectFactory.getObject();
         applicationRepository.save(DtoToEntityMapper.map(registerApplicationDTO));
-        handleResponse(apiResponse, "OK", 201, true);
+        handleResponse(apiResponse, "OK", 201);
         return apiResponse;
     }
 
@@ -69,7 +69,7 @@ public class LogServiceImpl implements LogService {
             ApplicationLogDTO applicationLogDTO = mapper.readValue(message, ApplicationLogDTO.class);
             ApplicationLog applicationLog = DtoToEntityMapper.map(applicationLogDTO);
             applicationLogRepository.save(applicationLog);
-            log.error("Successfully Stored Log In The Database");
+            log.info("Successfully Stored Log In The Database");
         } catch (Exception ex) {
             log.error("Error mapping message : {}", ex.getMessage());
         }
@@ -82,10 +82,9 @@ public class LogServiceImpl implements LogService {
         return objectMapper.writeValueAsString(databaseResponse);
     }
 
-    private void handleResponse(ApiResponse apiResponse, String data, int code, boolean isSuccess) {
+    private void handleResponse(ApiResponse apiResponse, String data, int code) {
         apiResponse.setData(data);
         apiResponse.setResponseCode(code);
-        apiResponse.setSuccess(isSuccess);
     }
 
     protected ObjectMapper generateMapper() {

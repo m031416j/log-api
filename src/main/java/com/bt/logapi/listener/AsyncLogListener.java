@@ -1,7 +1,6 @@
 package com.bt.logapi.listener;
 
 import com.bt.logapi.service.LogService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.aws.messaging.config.annotation.EnableSqs;
 import org.springframework.cloud.aws.messaging.listener.SqsMessageDeletionPolicy;
@@ -20,7 +19,7 @@ public class AsyncLogListener {
     }
 
     @SqsListener(value = "${aws.sqs.queue-url}", deletionPolicy = SqsMessageDeletionPolicy.ON_SUCCESS)
-    public void receiveMessage(final String message) throws JsonProcessingException {
+    public void receiveMessage(final String message) {
         log.info("Processing Async Log Listener Request : {}", message);
         service.saveLog(message);
     }

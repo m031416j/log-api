@@ -15,5 +15,4 @@ public class ApiResponse {
 
     private int responseCode;
     private String data;
-    private boolean isSuccess;
 }
