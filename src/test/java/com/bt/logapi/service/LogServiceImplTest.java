@@ -87,7 +87,7 @@ class LogServiceImplTest {
         // then
         assertNotNull(response);
         assertEquals(String.format("No logs found for application : %s", id), response.getData());
-        assertEquals(400, response.getResponseCode());
+        assertEquals(404, response.getResponseCode());
 
     }
 
